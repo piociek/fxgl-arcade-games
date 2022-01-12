@@ -6,6 +6,7 @@ import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.logging.Logger;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -24,9 +25,11 @@ public class PongGame extends GameApplication {
     private Entity paddle2;
     private Entity ball;
 
+    private int uiPositionY;
+
     @Override
     protected void initSettings(GameSettings settings) {
-        settings.setTitle("Pong v1");
+        settings.setTitle("FXGL-Pong");
         settings.setCloseConfirmation(false);
         settings.setDeveloperMenuEnabled(true);
     }
@@ -37,16 +40,16 @@ public class PongGame extends GameApplication {
 
     @Override
     protected void initInput() {
-        onKey(KeyCode.W, () -> paddle1.getComponent(PhysicsComponent.class).setVelocityY(-PADDLE_SPEED));
-        onKey(KeyCode.S, () -> paddle1.getComponent(PhysicsComponent.class).setVelocityY(PADDLE_SPEED));
-        onKey(KeyCode.UP, () -> paddle2.getComponent(PhysicsComponent.class).setVelocityY(-PADDLE_SPEED));
-        onKey(KeyCode.DOWN, () -> paddle2.getComponent(PhysicsComponent.class).setVelocityY(PADDLE_SPEED));
+        onKeyDown(KeyCode.W, () -> paddle1.getComponent(PhysicsComponent.class).setVelocityY(-PADDLE_SPEED));
+        onKeyDown(KeyCode.S, () -> paddle1.getComponent(PhysicsComponent.class).setVelocityY(PADDLE_SPEED));
+        onKeyDown(KeyCode.UP, () -> paddle2.getComponent(PhysicsComponent.class).setVelocityY(-PADDLE_SPEED));
+        onKeyDown(KeyCode.DOWN, () -> paddle2.getComponent(PhysicsComponent.class).setVelocityY(PADDLE_SPEED));
     }
 
     @Override
     protected void initGameVars(Map<String, Object> vars) {
-        vars.put(SCORE_1, 0);
-        vars.put(SCORE_2, 0);
+        vars.put(VAR_SCORE_1, 0);
+        vars.put(VAR_SCORE_2, 0);
     }
 
     @Override
@@ -67,35 +70,41 @@ public class PongGame extends GameApplication {
         spawnNewBall(Direction.RIGHT);
 
         ball.getComponent(PhysicsComponent.class).setVelocityX(BALL_SPEED);
+
+        uiPositionY = getAppHeight() - PADDLE_WIDTH;
     }
 
     @Override
     protected void initUI() {
-        Text textScoreTop = getUIFactoryService().newText("Score", Color.BLACK, 25);
-        textScoreTop.setTranslateX(getAppWidth() / 2 - 25);
-        textScoreTop.setTranslateY(100);
+        HBox scorePlayer1 = new HBox();
+        scorePlayer1.setSpacing(5);
+        scorePlayer1.setTranslateX(PADDLE_WIDTH * 2);
+        scorePlayer1.setTranslateY(uiPositionY);
 
-        Text textScoreBottom = getUIFactoryService().newText(":", Color.BLACK, 25);
-        textScoreBottom.setTranslateX(getAppWidth() / 2);
-        textScoreBottom.setTranslateY(130);
+        Text textScore1 = getUIFactoryService().newText(UI_SCORE, Color.BLACK, 20);
+        Text textScoreValue1 = getUIFactoryService().newText("", Color.BLACK, 20);
+        textScoreValue1.textProperty().bind(getWorldProperties().intProperty(VAR_SCORE_1).asString());
+        scorePlayer1.getChildren().addAll(textScore1, textScoreValue1);
 
-        Text textScore1 = getUIFactoryService().newText("", Color.BLACK, 25);
-        textScore1.setTranslateX(getAppWidth() / 2 - 25);
-        textScore1.setTranslateY(130);
+        HBox scorePlayer2 = new HBox();
+        scorePlayer2.setSpacing(5);
+        scorePlayer2.setTranslateX(getAppWidth() - PADDLE_WIDTH * 5);
+        scorePlayer2.setTranslateY(uiPositionY);
 
-        Text textScore2 = getUIFactoryService().newText("", Color.BLACK, 25);
-        textScore2.setTranslateX(getAppWidth() / 2 + 25);
-        textScore2.setTranslateY(130);
+        Text textScore2 = getUIFactoryService().newText(UI_SCORE, Color.BLACK, 20);
+        Text textScoreValue2 = getUIFactoryService().newText("", Color.BLACK, 20);
+        textScoreValue2.textProperty().bind(getWorldProperties().intProperty(VAR_SCORE_2).asString());
+        scorePlayer2.getChildren().addAll(textScore2, textScoreValue2);
 
-        textScore1.textProperty().bind(getWorldProperties().intProperty(SCORE_1).asString());
-        textScore2.textProperty().bind(getWorldProperties().intProperty(SCORE_2).asString());
-
-        getGameScene().addUINodes(textScoreTop, textScoreBottom, textScore1, textScore2);
+        getGameScene().addUINodes(scorePlayer1, scorePlayer2);
     }
 
     @Override
     protected void onUpdate(double tpf) {
-
+        if (ball.getComponent(PhysicsComponent.class).getVelocityX() == 0) {
+            LOGGER.fatal("Ball velocityX == 0");
+            spawnNewBall(Direction.RIGHT);
+        }
     }
 
     @Override
@@ -105,9 +114,6 @@ public class PongGame extends GameApplication {
         onCollisionBegin(BALL, PADDLE, (ball, paddle) -> {
                     ball.getComponent(PhysicsComponent.class)
                             .setVelocityX(ball.getComponent(PhysicsComponent.class).getVelocityX() * -1);
-                    if (ball.getComponent(PhysicsComponent.class).getVelocityX() == 0) {
-                        LOGGER.fatal("Ball velocityX == 0");
-                    }
                     ball.getComponent(PhysicsComponent.class)
                             .setVelocityY(ball.getComponent(PhysicsComponent.class)
                                     .getVelocityY() + paddle.getComponent(PhysicsComponent.class).getVelocityY());
@@ -119,18 +125,18 @@ public class PongGame extends GameApplication {
                                 .getVelocityY() * -1));
 
         onCollision(BALL, VOID_LEFT, (ball, voidLeft) -> {
-            getWorldProperties().increment(SCORE_2, +1);
+            getWorldProperties().increment(VAR_SCORE_2, +1);
             spawnNewBall(Direction.RIGHT);
         });
 
         onCollision(BALL, VOID_RIGHT, (ball, voidRight) -> {
-            getWorldProperties().increment(SCORE_1, +1);
+            getWorldProperties().increment(VAR_SCORE_1, +1);
             spawnNewBall(Direction.LEFT);
         });
 
-        onCollision(PADDLE, WALL, (paddle, wall) -> {
-            paddle.getComponent(PhysicsComponent.class).setVelocityY(0);
-        });
+        onCollisionBegin(PADDLE, WALL, (paddle, wall) ->
+                paddle.getComponent(PhysicsComponent.class).setVelocityY(
+                        paddle.getComponent(PhysicsComponent.class).getVelocityY() * -1));
     }
 
     private void spawnNewBall(Direction direction) {
