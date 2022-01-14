@@ -25,8 +25,9 @@ public class PongEntityFactory implements EntityFactory {
                 .type(PADDLE)
                 .bbox(new HitBox(BoundingShape.box(PADDLE_WIDTH, PADDLE_HEIGHT)))
                 .viewWithBBox(new Rectangle(PADDLE_WIDTH, PADDLE_HEIGHT))
-                .collidable()
                 .with(physicsComponent)
+                .with(new PaddleMoveComponent())
+                .collidable()
                 .build();
     }
 
@@ -39,8 +40,8 @@ public class PongEntityFactory implements EntityFactory {
                 .type(BALL)
                 .bbox(new HitBox(BoundingShape.box(BALL_SIZE, BALL_SIZE)))
                 .viewWithBBox(new Rectangle(BALL_SIZE, BALL_SIZE))
-                .collidable()
                 .with(physicsComponent)
+                .collidable()
                 .build();
     }
 
@@ -50,8 +51,8 @@ public class PongEntityFactory implements EntityFactory {
                 .type(WALL)
                 .at(-BALL_SIZE, spawnData.getY())
                 .bbox(new HitBox(BoundingShape.box(getAppWidth() + (2 * BALL_SIZE), 0)))
-                .collidable()
                 .with(new PhysicsComponent())
+                .collidable()
                 .build();
     }
 
@@ -61,9 +62,9 @@ public class PongEntityFactory implements EntityFactory {
                 .type(VOID_LEFT)
                 .at(-BALL_SIZE, 0)
                 .bbox(new HitBox(BoundingShape.box(0, getAppHeight())))
-                .collidable()
                 .with(new PhysicsComponent())
-                .buildAndAttach();
+                .collidable()
+                .build();
     }
 
     @Spawns("void_right")
@@ -72,8 +73,8 @@ public class PongEntityFactory implements EntityFactory {
                 .type(VOID_RIGHT)
                 .at(getAppWidth() + BALL_SIZE, 0)
                 .bbox(new HitBox(BoundingShape.box(0, getAppHeight())))
-                .collidable()
                 .with(new PhysicsComponent())
-                .buildAndAttach();
+                .collidable()
+                .build();
     }
 }
