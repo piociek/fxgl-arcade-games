@@ -4,6 +4,7 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.logging.Logger;
+import com.almasb.fxgl.physics.CollisionHandler;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -40,10 +41,11 @@ public class PongGame extends GameApplication {
 
     @Override
     protected void initInput() {
-        onKeyDown(KeyCode.W, () -> paddle1.getComponent(PhysicsComponent.class).setVelocityY(-PADDLE_SPEED));
-        onKeyDown(KeyCode.S, () -> paddle1.getComponent(PhysicsComponent.class).setVelocityY(PADDLE_SPEED));
-        onKeyDown(KeyCode.UP, () -> paddle2.getComponent(PhysicsComponent.class).setVelocityY(-PADDLE_SPEED));
-        onKeyDown(KeyCode.DOWN, () -> paddle2.getComponent(PhysicsComponent.class).setVelocityY(PADDLE_SPEED));
+        onKeyDown(KeyCode.W, () -> paddle1.getComponent(PaddleMoveComponent.class).moveUp());
+        onKeyDown(KeyCode.S, () -> paddle1.getComponent(PaddleMoveComponent.class).moveDown());
+
+        onKeyDown(KeyCode.UP, () -> paddle2.getComponent(PaddleMoveComponent.class).moveUp());
+        onKeyDown(KeyCode.DOWN, () -> paddle2.getComponent(PaddleMoveComponent.class).moveDown());
     }
 
     @Override
@@ -119,6 +121,7 @@ public class PongGame extends GameApplication {
                                     .getVelocityY() + paddle.getComponent(PhysicsComponent.class).getVelocityY());
                 }
         );
+
         onCollisionBegin(BALL, WALL, (ball, wall) ->
                 ball.getComponent(PhysicsComponent.class)
                         .setVelocityY(ball.getComponent(PhysicsComponent.class)
@@ -134,9 +137,18 @@ public class PongGame extends GameApplication {
             spawnNewBall(Direction.LEFT);
         });
 
-        onCollisionBegin(PADDLE, WALL, (paddle, wall) ->
-                paddle.getComponent(PhysicsComponent.class).setVelocityY(
-                        paddle.getComponent(PhysicsComponent.class).getVelocityY() * -1));
+        getPhysicsWorld().addCollisionHandler(new CollisionHandler(PADDLE, WALL) {
+            @Override
+            protected void onCollisionBegin(Entity paddle, Entity wall) {
+                paddle.getComponent(PaddleMoveComponent.class).blockMovement();
+                paddle.getComponent(PaddleMoveComponent.class).reverseMovement();
+            }
+
+            @Override
+            protected void onCollisionEnd(Entity paddle, Entity wall) {
+                paddle.getComponent(PaddleMoveComponent.class).unBlockMovement();
+            }
+        });
     }
 
     private void spawnNewBall(Direction direction) {
