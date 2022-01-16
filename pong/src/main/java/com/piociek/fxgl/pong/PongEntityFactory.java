@@ -1,4 +1,4 @@
-package pong;
+package com.piociek.fxgl.pong;
 
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.EntityFactory;
@@ -11,8 +11,8 @@ import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import javafx.scene.shape.Rectangle;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
-import static pong.PongConstants.*;
-import static pong.PongEntityType.*;
+import static com.piociek.fxgl.pong.PongConstants.*;
+import static com.piociek.fxgl.pong.PongEntityType.*;
 
 public class PongEntityFactory implements EntityFactory {
 

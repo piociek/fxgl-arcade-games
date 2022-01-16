@@ -1,9 +1,9 @@
-package pong;
+package com.piociek.fxgl.pong;
 
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.physics.PhysicsComponent;
 
-import static pong.PongConstants.PADDLE_SPEED;
+import static com.piociek.fxgl.pong.PongConstants.PADDLE_SPEED;
 
 public class PaddleMoveComponent extends Component {
 

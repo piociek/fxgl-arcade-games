@@ -1,4 +1,4 @@
-package pong;
+package com.piociek.fxgl.pong;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
@@ -15,8 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
-import static pong.PongConstants.*;
-import static pong.PongEntityType.*;
+import static com.piociek.fxgl.pong.PongEntityType.*;
 
 public class PongGame extends GameApplication {
 
@@ -31,6 +30,7 @@ public class PongGame extends GameApplication {
     @Override
     protected void initSettings(GameSettings settings) {
         settings.setTitle("FXGL-Pong");
+        settings.setVersion("0.1");
         settings.setCloseConfirmation(false);
         settings.setDeveloperMenuEnabled(true);
     }
@@ -50,52 +50,52 @@ public class PongGame extends GameApplication {
 
     @Override
     protected void initGameVars(Map<String, Object> vars) {
-        vars.put(VAR_SCORE_1, 0);
-        vars.put(VAR_SCORE_2, 0);
+        vars.put(PongConstants.VAR_SCORE_1, 0);
+        vars.put(PongConstants.VAR_SCORE_2, 0);
     }
 
     @Override
     protected void initGame() {
         getGameWorld().addEntityFactory(pongEntityFactory);
 
-        spawn(ENTITY_WALL, 0, 0);
-        spawn(ENTITY_WALL, 0, getAppHeight());
-        spawn(ENTITY_VOID_LEFT);
-        spawn(ENTITY_VOID_RIGHT);
+        spawn(PongConstants.ENTITY_WALL, 0, 0);
+        spawn(PongConstants.ENTITY_WALL, 0, getAppHeight());
+        spawn(PongConstants.ENTITY_VOID_LEFT);
+        spawn(PongConstants.ENTITY_VOID_RIGHT);
 
-        paddle1 = spawn(ENTITY_PADDLE,
+        paddle1 = spawn(PongConstants.ENTITY_PADDLE,
                 0,
-                getAppHeight() / 2 - PADDLE_HEIGHT / 2);
-        paddle2 = spawn(ENTITY_PADDLE,
-                getAppWidth() - PADDLE_WIDTH,
-                getAppHeight() / 2 - PADDLE_HEIGHT / 2);
+                getAppHeight() / 2 - PongConstants.PADDLE_HEIGHT / 2);
+        paddle2 = spawn(PongConstants.ENTITY_PADDLE,
+                getAppWidth() - PongConstants.PADDLE_WIDTH,
+                getAppHeight() / 2 - PongConstants.PADDLE_HEIGHT / 2);
         spawnNewBall(Direction.RIGHT);
 
-        ball.getComponent(PhysicsComponent.class).setVelocityX(BALL_SPEED);
+        ball.getComponent(PhysicsComponent.class).setVelocityX(PongConstants.BALL_SPEED);
 
-        uiPositionY = getAppHeight() - PADDLE_WIDTH;
+        uiPositionY = getAppHeight() - PongConstants.PADDLE_WIDTH;
     }
 
     @Override
     protected void initUI() {
         HBox scorePlayer1 = new HBox();
         scorePlayer1.setSpacing(5);
-        scorePlayer1.setTranslateX(PADDLE_WIDTH * 2);
+        scorePlayer1.setTranslateX(PongConstants.PADDLE_WIDTH * 2);
         scorePlayer1.setTranslateY(uiPositionY);
 
-        Text textScore1 = getUIFactoryService().newText(UI_SCORE, Color.BLACK, 20);
+        Text textScore1 = getUIFactoryService().newText(PongConstants.UI_SCORE, Color.BLACK, 20);
         Text textScoreValue1 = getUIFactoryService().newText("", Color.BLACK, 20);
-        textScoreValue1.textProperty().bind(getWorldProperties().intProperty(VAR_SCORE_1).asString());
+        textScoreValue1.textProperty().bind(getWorldProperties().intProperty(PongConstants.VAR_SCORE_1).asString());
         scorePlayer1.getChildren().addAll(textScore1, textScoreValue1);
 
         HBox scorePlayer2 = new HBox();
         scorePlayer2.setSpacing(5);
-        scorePlayer2.setTranslateX(getAppWidth() - PADDLE_WIDTH * 5);
+        scorePlayer2.setTranslateX(getAppWidth() - PongConstants.PADDLE_WIDTH * 5);
         scorePlayer2.setTranslateY(uiPositionY);
 
-        Text textScore2 = getUIFactoryService().newText(UI_SCORE, Color.BLACK, 20);
+        Text textScore2 = getUIFactoryService().newText(PongConstants.UI_SCORE, Color.BLACK, 20);
         Text textScoreValue2 = getUIFactoryService().newText("", Color.BLACK, 20);
-        textScoreValue2.textProperty().bind(getWorldProperties().intProperty(VAR_SCORE_2).asString());
+        textScoreValue2.textProperty().bind(getWorldProperties().intProperty(PongConstants.VAR_SCORE_2).asString());
         scorePlayer2.getChildren().addAll(textScore2, textScoreValue2);
 
         getGameScene().addUINodes(scorePlayer1, scorePlayer2);
@@ -128,12 +128,12 @@ public class PongGame extends GameApplication {
                                 .getVelocityY() * -1));
 
         onCollision(BALL, VOID_LEFT, (ball, voidLeft) -> {
-            getWorldProperties().increment(VAR_SCORE_2, +1);
+            getWorldProperties().increment(PongConstants.VAR_SCORE_2, +1);
             spawnNewBall(Direction.RIGHT);
         });
 
         onCollision(BALL, VOID_RIGHT, (ball, voidRight) -> {
-            getWorldProperties().increment(VAR_SCORE_1, +1);
+            getWorldProperties().increment(PongConstants.VAR_SCORE_1, +1);
             spawnNewBall(Direction.LEFT);
         });
 
@@ -155,9 +155,9 @@ public class PongGame extends GameApplication {
         if (Objects.nonNull(ball)) {
             ball.removeFromWorld();
         }
-        ball = spawn(ENTITY_BALL,
-                getAppWidth() / 2 - BALL_SIZE / 2,
-                getAppHeight() / 2 - BALL_SIZE / 2);
-        ball.getComponent(PhysicsComponent.class).setVelocityX(BALL_SPEED * direction.value);
+        ball = spawn(PongConstants.ENTITY_BALL,
+                getAppWidth() / 2 - PongConstants.BALL_SIZE / 2,
+                getAppHeight() / 2 - PongConstants.BALL_SIZE / 2);
+        ball.getComponent(PhysicsComponent.class).setVelocityX(PongConstants.BALL_SPEED * direction.value);
     }
 }

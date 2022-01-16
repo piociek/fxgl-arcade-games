@@ -1,4 +1,4 @@
-package snake;
+package com.piociek.fxgl.snake;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
@@ -15,15 +15,14 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
-import static snake.MovementDirection.*;
-import static snake.SnakeConstants.*;
+import static com.piociek.fxgl.snake.SnakeConstants.*;
 
 public class SnakeGame extends GameApplication {
 
     private static final Logger LOGGER = Logger.get(SnakeGame.class);
 
-    private MovementDirection currentMove = RIGHT;
-    private MovementDirection nextMove = NONE;
+    private MovementDirection currentMove = MovementDirection.RIGHT;
+    private MovementDirection nextMove = MovementDirection.NONE;
     private LocalTimer nextMoveTimer;
 
     private SnakeBodyPart snakeHeadBodyPart;
@@ -40,8 +39,8 @@ public class SnakeGame extends GameApplication {
         getGameWorld().removeEntities(gameEntities);
         createSnake();
         createNewBlock();
-        currentMove = RIGHT;
-        nextMove = NONE;
+        currentMove = MovementDirection.RIGHT;
+        nextMove = MovementDirection.NONE;
     };
 
     public static void main(String[] args) {
@@ -70,15 +69,15 @@ public class SnakeGame extends GameApplication {
     private void createSnake() {
         SnakeBodyPart tail = new SnakeBodyPart(
                 spawn(ENTITY_BLOCK, 4 * BLOCK_SIZE, 5 * BLOCK_SIZE),
-                RIGHT,
+                MovementDirection.RIGHT,
                 null);
         SnakeBodyPart middle = new SnakeBodyPart(
                 spawn(ENTITY_BLOCK, 5 * BLOCK_SIZE, 5 * BLOCK_SIZE),
-                RIGHT,
+                MovementDirection.RIGHT,
                 tail);
         snakeHeadBodyPart = new SnakeBodyPart(
                 spawn(ENTITY_BLOCK, 6 * BLOCK_SIZE, 5 * BLOCK_SIZE),
-                RIGHT,
+                MovementDirection.RIGHT,
                 middle
         );
     }
@@ -90,14 +89,14 @@ public class SnakeGame extends GameApplication {
 
     @Override
     protected void initInput() {
-        onKeyDown(KeyCode.W, () -> nextMove = UP);
-        onKeyDown(KeyCode.UP, () -> nextMove = UP);
-        onKeyDown(KeyCode.A, () -> nextMove = LEFT);
-        onKeyDown(KeyCode.LEFT, () -> nextMove = LEFT);
-        onKeyDown(KeyCode.S, () -> nextMove = DOWN);
-        onKeyDown(KeyCode.DOWN, () -> nextMove = DOWN);
-        onKeyDown(KeyCode.D, () -> nextMove = RIGHT);
-        onKeyDown(KeyCode.RIGHT, () -> nextMove = RIGHT);
+        onKeyDown(KeyCode.W, () -> nextMove = MovementDirection.UP);
+        onKeyDown(KeyCode.UP, () -> nextMove = MovementDirection.UP);
+        onKeyDown(KeyCode.A, () -> nextMove = MovementDirection.LEFT);
+        onKeyDown(KeyCode.LEFT, () -> nextMove = MovementDirection.LEFT);
+        onKeyDown(KeyCode.S, () -> nextMove = MovementDirection.DOWN);
+        onKeyDown(KeyCode.DOWN, () -> nextMove = MovementDirection.DOWN);
+        onKeyDown(KeyCode.D, () -> nextMove = MovementDirection.RIGHT);
+        onKeyDown(KeyCode.RIGHT, () -> nextMove = MovementDirection.RIGHT);
     }
 
     @Override
@@ -105,10 +104,10 @@ public class SnakeGame extends GameApplication {
         if (nextMoveTimer.elapsed(Duration.seconds(0.3))) {
             nextMoveTimer.capture();
 
-            if (nextMove != NONE) {
+            if (nextMove != MovementDirection.NONE) {
                 currentMove = isMoveValid(currentMove, nextMove) ? nextMove : currentMove;
                 LOGGER.info(LOG_MOVE_DIRECTION.formatted(currentMove));
-                nextMove = NONE;
+                nextMove = MovementDirection.NONE;
             }
 
             Entity headBlock = snakeHeadBodyPart.getBodyEntity();
@@ -142,10 +141,10 @@ public class SnakeGame extends GameApplication {
 
     private boolean isMoveValid(MovementDirection currentDirection, MovementDirection nextDirection) {
         return switch (currentDirection) {
-            case UP -> nextDirection != DOWN;
-            case DOWN -> nextDirection != UP;
-            case LEFT -> nextDirection != RIGHT;
-            case RIGHT -> nextDirection != LEFT;
+            case UP -> nextDirection != MovementDirection.DOWN;
+            case DOWN -> nextDirection != MovementDirection.UP;
+            case LEFT -> nextDirection != MovementDirection.RIGHT;
+            case RIGHT -> nextDirection != MovementDirection.LEFT;
             case NONE -> false;
         };
     }
