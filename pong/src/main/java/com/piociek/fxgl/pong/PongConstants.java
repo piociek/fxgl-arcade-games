@@ -1,4 +1,4 @@
-package pong;
+package com.piociek.fxgl.pong;
 
 public abstract class PongConstants {
 

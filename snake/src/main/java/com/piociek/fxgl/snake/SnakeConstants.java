@@ -1,4 +1,4 @@
-package snake;
+package com.piociek.fxgl.snake;
 
 public abstract class SnakeConstants {
 

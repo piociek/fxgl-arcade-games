@@ -1,4 +1,4 @@
-package snake;
+package com.piociek.fxgl.snake;
 
 import com.almasb.fxgl.entity.Entity;
 import lombok.AllArgsConstructor;
