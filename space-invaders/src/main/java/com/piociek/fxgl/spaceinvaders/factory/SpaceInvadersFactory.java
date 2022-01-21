@@ -19,7 +19,7 @@ public class SpaceInvadersFactory {
         } catch (RuntimeException e) {
             // ignore
         }
-        return spawn(ENTITY_PLAYER, getAppWidth() / 2.0, getAppHeight() - 1.5 * PLAYER_HEIGHT);
+        return spawn(ENTITY_PLAYER, getAppWidth() / 2.0, getAppHeight() + 1.5 * PLAYER_HEIGHT);
     }
 
     public Entity[][] spawnEnemies() {

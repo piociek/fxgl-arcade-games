@@ -26,5 +26,8 @@ hs_err_pid*
 .idea
 *.iml
 
-#FXGL
+# Maven
+target/
+
+# FXGL
 system/

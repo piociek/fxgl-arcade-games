@@ -3,6 +3,7 @@ package com.piociek.fxgl.spaceinvaders;
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.SpawnData;
 import com.piociek.fxgl.spaceinvaders.component.ScoreComponent;
 import com.piociek.fxgl.spaceinvaders.factory.SpaceInvadersEntityFactory;
 import com.piociek.fxgl.spaceinvaders.factory.SpaceInvadersFactory;
@@ -30,7 +31,7 @@ public class SpaceInvadersGame extends GameApplication {
     private Entity[][] enemies;
 
     private final Runnable startNewGame = () -> {
-        factory.deleteAllEntities(ENEMY, BULLET, BOMB, UFO);
+        factory.deleteAllEntities(ENEMY, BULLET, BOMB, UFO, EXPLOSION);
 
         player = factory.spawnPlayer();
         enemies = factory.spawnEnemies();
@@ -61,6 +62,7 @@ public class SpaceInvadersGame extends GameApplication {
     @Override
     protected void initGame() {
         getGameWorld().addEntityFactory(new SpaceInvadersEntityFactory());
+        spawn(ENTITY_BACKGROUND);
         spawn(ENTITY_SCREEN_END, 0, getAppHeight());
 
         startNewGame.run();
@@ -113,6 +115,7 @@ public class SpaceInvadersGame extends GameApplication {
     protected void initPhysics() {
         onCollisionBegin(BULLET, ENEMY, (bullet, enemy) -> {
             bullet.removeFromWorld();
+            spawn(ENTITY_EXPLOSION, new SpawnData(enemy.getCenter()));
             enemy.removeFromWorld();
             getWorldProperties().increment(VAR_SCORE, enemy.getComponent(ScoreComponent.class).getScore());
             checkForGameOver();
@@ -121,26 +124,30 @@ public class SpaceInvadersGame extends GameApplication {
 
         onCollisionBegin(BULLET, UFO, (bullet, ufo) -> {
             bullet.removeFromWorld();
+            spawn(ENTITY_EXPLOSION, new SpawnData(ufo.getCenter()));
             ufo.removeFromWorld();
             getWorldProperties().increment(VAR_SCORE, UFO_SCORE);
         });
 
         onCollisionBegin(BOMB, PLAYER, (bomb, player) -> {
+            bomb.removeFromWorld();
+            spawn(ENTITY_EXPLOSION, new SpawnData(this.player.getCenter()));
             getWorldProperties().increment(VAR_LIVES, -1);
             if (getWorldProperties().getInt(VAR_LIVES) == 0) {
                 finishGame();
             }
-            bomb.removeFromWorld();
             this.player = factory.spawnPlayer();
         });
 
         onCollisionBegin(PLAYER, ENEMY, (player, enemy) -> {
+            spawn(ENTITY_EXPLOSION, new SpawnData(enemy.getCenter()));
+            enemy.removeFromWorld();
+            checkForGameOver();
+            spawn(ENTITY_EXPLOSION, new SpawnData(this.player.getCenter()));
             getWorldProperties().increment(VAR_LIVES, -1);
             if (getWorldProperties().getInt(VAR_LIVES) == 0) {
                 finishGame();
             }
-            enemy.removeFromWorld();
-            checkForGameOver();
             this.player = factory.spawnPlayer();
         });
 
@@ -150,7 +157,14 @@ public class SpaceInvadersGame extends GameApplication {
 
     @Override
     protected void onUpdate(double tpf) {
+        movePlayerToView();
         enemyMovement.move();
+    }
+
+    private void movePlayerToView() {
+        if (player.getY() >= getAppHeight() - 1.5 * PLAYER_HEIGHT) {
+            player.translateY(-PLAYER_SPEED);
+        }
     }
 
     private void checkForGameOver() {
